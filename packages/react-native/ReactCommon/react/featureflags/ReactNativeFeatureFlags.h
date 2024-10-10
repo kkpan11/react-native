@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<8d28b4f3ffac32a287c9b858d62e39e1>>
+ * @generated SignedSource<<3bbe3eb333030be7f32c0965c9db4a5c>>
  */
 
 /**
@@ -58,11 +58,6 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool completeReactInstanceCreationOnBgThreadOnAndroid();
 
   /**
-   * When enabled, ReactInstanceManager will clean up Fabric surfaces on destroy().
-   */
-  RN_EXPORT static bool destroyFabricSurfacesInReactInstanceManager();
-
-  /**
    * Kill-switch to turn off support for aling-items:baseline on Fabric iOS.
    */
   RN_EXPORT static bool enableAlignItemsBaselineOnFabricIOS();
@@ -73,14 +68,9 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool enableAndroidLineHeightCentering();
 
   /**
-   * Enables mix-blend-mode prop on Android.
+   * Feature flag to enable the new bridgeless architecture. Note: Enabling this will force enable the following flags: `useTurboModules` & `enableFabricRenderer.
    */
-  RN_EXPORT static bool enableAndroidMixBlendModeProp();
-
-  /**
-   * Use BackgroundStyleApplicator in place of other background/border drawing code
-   */
-  RN_EXPORT static bool enableBackgroundStyleApplicator();
+  RN_EXPORT static bool enableBridgelessArchitecture();
 
   /**
    * Clean yoga node when <TextInput /> does not change.
@@ -108,6 +98,11 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool enableFabricLogs();
 
   /**
+   * Enables the use of the Fabric renderer in the whole app.
+   */
+  RN_EXPORT static bool enableFabricRenderer();
+
+  /**
    * When the app is completely migrated to Fabric, set this flag to true to disable parts of Paper infrastructure that are not needed anymore but consume memory and CPU. Specifically, UIViewOperationQueue and EventDispatcherImpl will no longer work as they will not subscribe to ReactChoreographer for updates.
    */
   RN_EXPORT static bool enableFabricRendererExclusively();
@@ -123,6 +118,11 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool enableIOSViewClipToPaddingBox();
 
   /**
+   * When enabled, LayoutAnimations API will animate state changes on Android.
+   */
+  RN_EXPORT static bool enableLayoutAnimationsOnAndroid();
+
+  /**
    * When enabled, LayoutAnimations API will animate state changes on iOS.
    */
   RN_EXPORT static bool enableLayoutAnimationsOnIOS();
@@ -136,6 +136,11 @@ class ReactNativeFeatureFlags {
    * Enables the use of microtasks in Hermes (scheduling) and RuntimeScheduler (execution).
    */
   RN_EXPORT static bool enableMicrotasks();
+
+  /**
+   * Moves execution of pre-mount items to outside the choregrapher in the main thread, so we can estimate idle time more precisely (Android only).
+   */
+  RN_EXPORT static bool enablePreciseSchedulingForPremountItemsOnAndroid();
 
   /**
    * When enabled, Android will receive prop updates based on the differences between the last rendered shadow node and the last committed shadow node.
@@ -218,6 +223,11 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool loadVectorDrawablesOnImages();
 
   /**
+   * Removes nested calls to MountItemDispatcher.dispatchMountItems on Android, so we do less work per frame on the UI thread.
+   */
+  RN_EXPORT static bool removeNestedCallsToDispatchMountItemsOnAndroid();
+
+  /**
    * Propagate layout direction to Android views.
    */
   RN_EXPORT static bool setAndroidLayoutDirection();
@@ -248,11 +258,6 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool useNativeViewConfigsInBridgelessMode();
 
   /**
-   * Use shared background drawing code for ReactImageView instead of using Fresco to manipulate the bitmap
-   */
-  RN_EXPORT static bool useNewReactImageViewBackgroundDrawing();
-
-  /**
    * Moves more of the work in view preallocation to the main thread to free up JS thread.
    */
   RN_EXPORT static bool useOptimisedViewPreallocationOnAndroid();
@@ -268,19 +273,14 @@ class ReactNativeFeatureFlags {
   RN_EXPORT static bool useRuntimeShadowNodeReferenceUpdate();
 
   /**
-   * When enabled, cloning shadow nodes during layout will update the reference held by the current JS fiber tree.
-   */
-  RN_EXPORT static bool useRuntimeShadowNodeReferenceUpdateOnLayout();
-
-  /**
-   * When enabled, it uses optimised state reconciliation algorithm.
-   */
-  RN_EXPORT static bool useStateAlignmentMechanism();
-
-  /**
    * In Bridgeless mode, should legacy NativeModules use the TurboModule system?
    */
   RN_EXPORT static bool useTurboModuleInterop();
+
+  /**
+   * When enabled, NativeModules will be executed by using the TurboModule system
+   */
+  RN_EXPORT static bool useTurboModules();
 
   /**
    * Overrides the feature flags with the ones provided by the given provider

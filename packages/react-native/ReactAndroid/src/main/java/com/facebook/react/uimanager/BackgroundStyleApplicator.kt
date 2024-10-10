@@ -148,6 +148,10 @@ public object BackgroundStyleApplicator {
 
   @JvmStatic
   public fun setOutlineColor(view: View, @ColorInt outlineColor: Int?): Unit {
+    if (ViewUtil.getUIManagerType(view) != UIManagerType.FABRIC) {
+      return
+    }
+
     val outline = ensureOutlineDrawable(view)
     if (outlineColor != null) {
       outline.outlineColor = outlineColor
@@ -158,6 +162,10 @@ public object BackgroundStyleApplicator {
 
   @JvmStatic
   public fun setOutlineOffset(view: View, outlineOffset: Float): Unit {
+    if (ViewUtil.getUIManagerType(view) != UIManagerType.FABRIC) {
+      return
+    }
+
     val outline = ensureOutlineDrawable(view)
     outline.outlineOffset = outlineOffset.dpToPx()
   }
@@ -166,6 +174,10 @@ public object BackgroundStyleApplicator {
 
   @JvmStatic
   public fun setOutlineStyle(view: View, outlineStyle: OutlineStyle?): Unit {
+    if (ViewUtil.getUIManagerType(view) != UIManagerType.FABRIC) {
+      return
+    }
+
     val outline = ensureOutlineDrawable(view)
     if (outlineStyle != null) {
       outline.outlineStyle = outlineStyle
@@ -176,6 +188,10 @@ public object BackgroundStyleApplicator {
 
   @JvmStatic
   public fun setOutlineWidth(view: View, width: Float): Unit {
+    if (ViewUtil.getUIManagerType(view) != UIManagerType.FABRIC) {
+      return
+    }
+
     val outline = ensureOutlineDrawable(view)
     outline.outlineWidth = width.dpToPx()
   }
@@ -239,7 +255,7 @@ public object BackgroundStyleApplicator {
 
     val shadowStyles = mutableListOf<BoxShadow>()
     for (i in 0..<shadows.size()) {
-      shadowStyles.add(checkNotNull(BoxShadow.parse(shadows.getMap(i))))
+      shadowStyles.add(checkNotNull(BoxShadow.parse(shadows.getMap(i), view.context)))
     }
     BackgroundStyleApplicator.setBoxShadow(view, shadowStyles)
   }

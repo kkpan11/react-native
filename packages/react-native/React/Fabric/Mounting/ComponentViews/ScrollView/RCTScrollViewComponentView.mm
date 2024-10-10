@@ -74,7 +74,7 @@ RCTSendScrollEventForNativeAnimations_DEPRECATED(UIScrollView *scrollView, NSInt
                                                                  userData:nil
                                                             coalescingKey:coalescingKey];
   NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:scrollEvent, @"event", nil];
-  [[NSNotificationCenter defaultCenter] postNotificationName:@"RCTNotifyEventDispatcherObserversOfEvent_DEPRECATED"
+  [[NSNotificationCenter defaultCenter] postNotificationName:RCTNotifyEventDispatcherObserversOfEvent_DEPRECATED
                                                       object:nil
                                                     userInfo:userInfo];
 }
@@ -552,12 +552,14 @@ static inline UIViewAnimationOptions animationOptionsWithCurve(UIViewAnimationCu
   if (!_state) {
     return;
   }
+
   auto contentOffset = RCTPointFromCGPoint(_scrollView.contentOffset);
-  _state->updateState([contentOffset](const ScrollViewShadowNode::ConcreteState::Data &data) {
-    auto newData = data;
-    newData.contentOffset = contentOffset;
-    return std::make_shared<const ScrollViewShadowNode::ConcreteState::Data>(newData);
-  });
+  auto data = _state->getData();
+
+  if (contentOffset != data.contentOffset) {
+    data.contentOffset = contentOffset;
+    _state->updateState(std::move(data));
+  }
 }
 
 - (void)prepareForRecycle

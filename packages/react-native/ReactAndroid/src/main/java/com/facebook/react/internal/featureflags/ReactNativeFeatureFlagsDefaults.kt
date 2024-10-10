@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @generated SignedSource<<06791e428f1e199b718f11c6bc1f1414>>
+ * @generated SignedSource<<d44c7d51caea5eaa3074217361959b3a>>
  */
 
 /**
@@ -31,15 +31,11 @@ public open class ReactNativeFeatureFlagsDefaults : ReactNativeFeatureFlagsProvi
 
   override fun completeReactInstanceCreationOnBgThreadOnAndroid(): Boolean = false
 
-  override fun destroyFabricSurfacesInReactInstanceManager(): Boolean = false
-
   override fun enableAlignItemsBaselineOnFabricIOS(): Boolean = true
 
   override fun enableAndroidLineHeightCentering(): Boolean = false
 
-  override fun enableAndroidMixBlendModeProp(): Boolean = false
-
-  override fun enableBackgroundStyleApplicator(): Boolean = true
+  override fun enableBridgelessArchitecture(): Boolean = false
 
   override fun enableCleanTextInputYogaNode(): Boolean = false
 
@@ -51,17 +47,23 @@ public open class ReactNativeFeatureFlagsDefaults : ReactNativeFeatureFlagsProvi
 
   override fun enableFabricLogs(): Boolean = false
 
+  override fun enableFabricRenderer(): Boolean = false
+
   override fun enableFabricRendererExclusively(): Boolean = false
 
   override fun enableGranularShadowTreeStateReconciliation(): Boolean = false
 
   override fun enableIOSViewClipToPaddingBox(): Boolean = false
 
+  override fun enableLayoutAnimationsOnAndroid(): Boolean = false
+
   override fun enableLayoutAnimationsOnIOS(): Boolean = true
 
   override fun enableLongTaskAPI(): Boolean = false
 
   override fun enableMicrotasks(): Boolean = false
+
+  override fun enablePreciseSchedulingForPremountItemsOnAndroid(): Boolean = false
 
   override fun enablePropsUpdateReconciliationAndroid(): Boolean = false
 
@@ -95,7 +97,9 @@ public open class ReactNativeFeatureFlagsDefaults : ReactNativeFeatureFlagsProvi
 
   override fun loadVectorDrawablesOnImages(): Boolean = false
 
-  override fun setAndroidLayoutDirection(): Boolean = false
+  override fun removeNestedCallsToDispatchMountItemsOnAndroid(): Boolean = false
+
+  override fun setAndroidLayoutDirection(): Boolean = true
 
   override fun traceTurboModulePromiseRejectionsOnAndroid(): Boolean = false
 
@@ -107,17 +111,13 @@ public open class ReactNativeFeatureFlagsDefaults : ReactNativeFeatureFlagsProvi
 
   override fun useNativeViewConfigsInBridgelessMode(): Boolean = false
 
-  override fun useNewReactImageViewBackgroundDrawing(): Boolean = false
-
   override fun useOptimisedViewPreallocationOnAndroid(): Boolean = false
 
   override fun useOptimizedEventBatchingOnAndroid(): Boolean = false
 
-  override fun useRuntimeShadowNodeReferenceUpdate(): Boolean = false
-
-  override fun useRuntimeShadowNodeReferenceUpdateOnLayout(): Boolean = false
-
-  override fun useStateAlignmentMechanism(): Boolean = false
+  override fun useRuntimeShadowNodeReferenceUpdate(): Boolean = true
 
   override fun useTurboModuleInterop(): Boolean = false
+
+  override fun useTurboModules(): Boolean = false
 }

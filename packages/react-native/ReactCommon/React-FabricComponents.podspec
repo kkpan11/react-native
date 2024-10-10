@@ -19,9 +19,10 @@ end
 folly_config = get_folly_config()
 folly_compiler_flags = folly_config[:compiler_flags]
 folly_version = folly_config[:version]
+folly_dep_name = folly_config[:dep_name]
 
-folly_dep_name = 'RCT-Folly/Fabric'
-boost_compiler_flags = '-Wno-documentation'
+boost_config = get_boost_config()
+boost_compiler_flags = boost_config[:compiler_flags] 
 react_native_path = ".."
 
 Pod::Spec.new do |s|
@@ -152,7 +153,8 @@ Pod::Spec.new do |s|
     ss.subspec "iostextinput" do |sss|
       sss.dependency             folly_dep_name, folly_version
       sss.compiler_flags       = folly_compiler_flags
-      sss.source_files         = "react/renderer/components/textinput/platform/ios/**/*.{m,mm,cpp,h}"
+      sss.source_files         = "react/renderer/components/textinput/**/*.{m,mm,cpp,h}"
+      sss.exclude_files        = "react/renderer/components/textinput/platform/android"
       sss.header_dir           = "react/renderer/components/iostextinput"
 
     end

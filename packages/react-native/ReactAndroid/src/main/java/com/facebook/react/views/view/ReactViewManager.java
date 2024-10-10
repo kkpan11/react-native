@@ -8,8 +8,8 @@
 package com.facebook.react.views.view;
 
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.view.View;
-import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Nullsafe;
@@ -106,7 +106,8 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
         List<BackgroundImageLayer> backgroundImageLayers = new ArrayList<>(backgroundImage.size());
         for (int i = 0; i < backgroundImage.size(); i++) {
           ReadableMap backgroundImageMap = backgroundImage.getMap(i);
-          BackgroundImageLayer layer = new BackgroundImageLayer(backgroundImageMap);
+          BackgroundImageLayer layer =
+              new BackgroundImageLayer(backgroundImageMap, view.getContext());
           backgroundImageLayers.add(layer);
         }
         BackgroundStyleApplicator.setBackgroundImage(view, backgroundImageLayers);
@@ -227,10 +228,13 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
 
   @ReactProp(name = "nativeBackgroundAndroid")
   public void setNativeBackground(ReactViewGroup view, @Nullable ReadableMap bg) {
-    view.setTranslucentBackgroundDrawable(
-        bg == null
-            ? null
-            : ReactDrawableHelper.createDrawableFromJSDescription(view.getContext(), bg));
+    Drawable background;
+    if (bg != null) {
+      background = ReactDrawableHelper.createDrawableFromJSDescription(view.getContext(), bg);
+    } else {
+      background = null;
+    }
+    BackgroundStyleApplicator.setFeedbackUnderlay(view, background);
   }
 
   @ReactProp(name = "nativeForegroundAndroid")
@@ -349,11 +353,6 @@ public class ReactViewManager extends ReactClippingViewManager<ReactViewGroup> {
   @ReactProp(name = ViewProps.BOX_SHADOW, customType = "BoxShadow")
   public void setBoxShadow(ReactViewGroup view, @Nullable ReadableArray shadows) {
     BackgroundStyleApplicator.setBoxShadow(view, shadows);
-  }
-
-  @Override
-  public void setBackgroundColor(ReactViewGroup view, @ColorInt int backgroundColor) {
-    BackgroundStyleApplicator.setBackgroundColor(view, backgroundColor);
   }
 
   @Override

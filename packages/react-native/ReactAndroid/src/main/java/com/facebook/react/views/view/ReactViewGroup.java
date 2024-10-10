@@ -7,6 +7,7 @@
 
 package com.facebook.react.views.view;
 
+import static com.facebook.infer.annotation.Assertions.nullsafeFIXME;
 import static com.facebook.react.common.ReactConstants.TAG;
 
 import android.annotation.SuppressLint;
@@ -28,13 +29,13 @@ import android.view.animation.Animation;
 import androidx.annotation.Nullable;
 import com.facebook.common.logging.FLog;
 import com.facebook.infer.annotation.Assertions;
+import com.facebook.infer.annotation.Nullsafe;
 import com.facebook.react.R;
 import com.facebook.react.bridge.ReactNoCrashSoftException;
 import com.facebook.react.bridge.ReactSoftExceptionLogger;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.common.annotations.VisibleForTesting;
 import com.facebook.react.config.ReactFeatureFlags;
-import com.facebook.react.internal.featureflags.ReactNativeFeatureFlags;
 import com.facebook.react.touch.OnInterceptTouchEventListener;
 import com.facebook.react.touch.ReactHitSlopView;
 import com.facebook.react.touch.ReactInterceptingViewGroup;
@@ -63,6 +64,7 @@ import com.facebook.react.uimanager.style.Overflow;
  * Backing for a React View. Has support for borders, but since borders aren't common, lazy
  * initializes most of the storage needed for them.
  */
+@Nullsafe(Nullsafe.Mode.LOCAL)
 public class ReactViewGroup extends ViewGroup
     implements ReactInterceptingViewGroup,
         ReactClippingViewGroup,
@@ -88,7 +90,7 @@ public class ReactViewGroup extends ViewGroup
    */
   private static final class ChildrenLayoutChangeListener implements View.OnLayoutChangeListener {
 
-    private final ReactViewGroup mParent;
+    @Nullable private ReactViewGroup mParent;
 
     private ChildrenLayoutChangeListener(ReactViewGroup parent) {
       mParent = parent;
@@ -105,11 +107,17 @@ public class ReactViewGroup extends ViewGroup
         int oldTop,
         int oldRight,
         int oldBottom) {
-      if (mParent.getRemoveClippedSubviews()) {
+      if (mParent != null && mParent.getRemoveClippedSubviews()) {
         mParent.updateSubviewClipStatus(v);
       }
     }
+
+    public void shutdown() {
+      mParent = null;
+    }
   }
+
+  private int mRecycleCount = 0;
 
   // Following properties are here to support the option {@code removeClippedSubviews}. This is a
   // temporary optimization/hack that is mainly applicable to the large list of images. The way
@@ -143,7 +151,7 @@ public class ReactViewGroup extends ViewGroup
   /**
    * Set all default values here as opposed to in the constructor or field defaults. It is important
    * that these properties are set during the constructor, but also on-demand whenever an existing
-   * ReactTextView is recycled.
+   * ReactViewGroup is recycled.
    */
   private void initView() {
     setClipChildren(false);
@@ -166,8 +174,10 @@ public class ReactViewGroup extends ViewGroup
   }
 
   /* package */ void recycleView() {
+    mRecycleCount++;
     // Remove dangling listeners
     if (mAllChildren != null && mChildrenLayoutChangeListener != null) {
+      mChildrenLayoutChangeListener.shutdown();
       for (int i = 0; i < mAllChildrenCount; i++) {
         mAllChildren[i].removeOnLayoutChangeListener(mChildrenLayoutChangeListener);
       }
@@ -381,7 +391,7 @@ public class ReactViewGroup extends ViewGroup
 
   @Override
   public void getClippingRect(Rect outClippingRect) {
-    outClippingRect.set(mClippingRect);
+    outClippingRect.set(nullsafeFIXME(mClippingRect, "Fix in Kotlin"));
   }
 
   @Override
@@ -401,7 +411,22 @@ public class ReactViewGroup extends ViewGroup
     Assertions.assertNotNull(mAllChildren);
     int clippedSoFar = 0;
     for (int i = 0; i < mAllChildrenCount; i++) {
-      updateSubviewClipStatus(clippingRect, i, clippedSoFar);
+      try {
+        updateSubviewClipStatus(clippingRect, i, clippedSoFar);
+      } catch (IndexOutOfBoundsException e) {
+        throw new IllegalStateException(
+            "Invalid clipping state. i="
+                + i
+                + " clippedSoFar="
+                + clippedSoFar
+                + " count="
+                + getChildCount()
+                + " allChildrenCount="
+                + mAllChildrenCount
+                + " recycleCount="
+                + mRecycleCount,
+            e);
+      }
       if (mAllChildren[i].getParent() == null) {
         clippedSoFar++;
       }
@@ -522,7 +547,7 @@ public class ReactViewGroup extends ViewGroup
     }
   }
 
-  private void handleRemoveView(View view) {
+  private void handleRemoveView(@Nullable View view) {
     UiThreadUtil.assertOnUiThread();
 
     if (!customDrawOrderDisabled()) {
@@ -546,7 +571,7 @@ public class ReactViewGroup extends ViewGroup
   }
 
   @Override
-  public void addView(View child, int index, ViewGroup.LayoutParams params) {
+  public void addView(View child, int index, @Nullable ViewGroup.LayoutParams params) {
     // This will get called for every overload of addView so there is not need to override every
     // method.
     handleAddView(child);
@@ -561,7 +586,7 @@ public class ReactViewGroup extends ViewGroup
   }
 
   @Override
-  public void removeView(View view) {
+  public void removeView(@Nullable View view) {
     handleRemoveView(view);
     super.removeView(view);
   }
@@ -781,10 +806,6 @@ public class ReactViewGroup extends ViewGroup
   }
 
   private boolean needsIsolatedLayer() {
-    if (!ReactNativeFeatureFlags.enableAndroidMixBlendModeProp()) {
-      return false;
-    }
-
     for (int i = 0; i < getChildCount(); i++) {
       if (getChildAt(i).getTag(R.id.mix_blend_mode) != null) {
         return true;
